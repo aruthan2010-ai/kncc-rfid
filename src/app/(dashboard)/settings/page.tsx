@@ -93,7 +93,7 @@ export default function SettingsPage() {
           <div>
             <label className="label">Late after</label>
             <input type="time" className="input" value={form.late_after_time} onChange={(e) => setForm({ ...form, late_after_time: e.target.value })} />
-            <p className="mt-1 text-xs text-slate-400">Scans after this time are marked "Late" instead of "Present".</p>
+            <p className="mt-1 text-xs text-slate-400">Scans after this time are marked &quot;Late&quot; instead of &quot;Present&quot;.</p>
           </div>
           <div>
             <label className="label">School end time</label>
