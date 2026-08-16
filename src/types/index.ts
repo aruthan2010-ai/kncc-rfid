@@ -141,7 +141,6 @@ export interface AuditLog {
 export interface SchoolSettings {
   id: number;
   school_name: string;
-  school_logo_url: string | null;
   late_after_time: string;
   school_start_time: string;
   school_end_time: string;

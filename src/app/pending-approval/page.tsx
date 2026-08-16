@@ -3,44 +3,11 @@
 import { useRouter } from "next/navigation";
 import { Clock3, LogOut, RefreshCw, School } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 
 export default function PendingApprovalPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(false);
-
-  // Listen for the Super Admin's approval in real time so access is granted
-  // the instant it happens - no manual refresh, and no separate sign-in needed.
-  useEffect(() => {
-    const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
-    supabase.auth.getUser().then(({ data }) => {
-      const userId = data.user?.id;
-      if (!userId) return;
-
-      channel = supabase
-        .channel(`profile-approval-${userId}`)
-        .on(
-          "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
-          (payload) => {
-            const next = payload.new as { status?: string; role?: string | null };
-            if (next.status === "approved" && next.role) {
-              toast.success("Your account has been approved!");
-              router.push("/dashboard");
-              router.refresh();
-            }
-          }
-        )
-        .subscribe();
-    });
-
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-    };
-  }, [router]);
 
   async function handleLogout() {
     const supabase = createClient();

@@ -82,14 +82,10 @@ export function Sidebar({
   role,
   open,
   onClose,
-  logoUrl,
-  schoolName,
 }: {
   role: UserRole;
   open: boolean;
   onClose: () => void;
-  logoUrl?: string | null;
-  schoolName?: string;
 }) {
   const pathname = usePathname();
 
@@ -106,17 +102,12 @@ export function Sidebar({
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-600 text-white">
-              {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={schoolName ?? "School logo"} className="h-full w-full object-contain" />
-              ) : (
-                <School className="h-5 w-5" />
-              )}
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
+              <School className="h-5 w-5" />
             </div>
             <div className="leading-tight">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">KNCC RFID</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">{schoolName ?? "Kilinochchi Central College"}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">Kilinochchi Central College</p>
             </div>
           </Link>
           <button onClick={onClose} className="rounded-md p-1 text-slate-400 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800" aria-label="Close menu">

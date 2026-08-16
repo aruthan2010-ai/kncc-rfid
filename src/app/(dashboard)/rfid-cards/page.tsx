@@ -284,7 +284,7 @@ export default function RfidCardsPage() {
                 placeholder="Scan or type card UID, e.g. A1B2C3D4"
               />
               <p className="mt-1 text-xs text-slate-400">
-                Tip: use the "RFID Registration Scan" endpoint on the ESP32 to auto-fill this from a physical tap.
+                Tip: use the &quot;RFID Registration Scan&quot; endpoint on the ESP32 to auto-fill this from a physical tap.
               </p>
             </div>
           )}
@@ -317,7 +317,7 @@ export default function RfidCardsPage() {
             <p><span className="text-slate-400">Disabled:</span> {formatDateTime(historyTarget.disabled_at)}</p>
             <p><span className="text-slate-400">Last scanned:</span> {formatDateTime(historyTarget.last_scanned_at)}</p>
             <p className="pt-2 text-xs text-slate-400">
-              Full scan-by-scan history for this card's student is available on the Attendance page.
+              Full scan-by-scan history for this card&apos;s student is available on the Attendance page.
             </p>
           </div>
         )}
