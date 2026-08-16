@@ -169,13 +169,8 @@ begin
 end;
 $$;
 
--- Only the server-side API (service_role) may process raw device scans.
-revoke all on function public.process_rfid_scan(text, text, timestamptz) from public;
-revoke all on function public.process_rfid_scan(text, text, timestamptz) from anon;
-revoke all on function public.process_rfid_scan(text, text, timestamptz) from authenticated;
-grant execute on function public.process_rfid_scan(text, text, timestamptz) to service_role;
-
 -- Serialise scans for the same RFID card to protect against simultaneous readers.
+-- (Access is locked down to service_role only, right after creation, below.)
 create or replace function public.process_rfid_scan(
   p_rfid_uid text,
   p_device_code text,
