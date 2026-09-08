@@ -8,7 +8,7 @@ import { verifyDeviceSecret } from "@/lib/device-auth";
  * report it is alive and share basic diagnostics.
  *
  * Body: {
- *   device_id: string,          // e.g. "RFID-01"
+ *   device_code: string,          // e.g. "RFID-01"
  *   device_secret: string,
  *   firmware_version?: string,
  *   ip_address?: string,
@@ -32,13 +32,13 @@ export async function POST(req: NextRequest) {
   const { data: device, error: findErr } = await supabase
     .from("attendance_devices")
     .select("id")
-    .eq("device_code", body.device_id)
+    .eq("device_code", body.device_code)
     .maybeSingle();
 
   if (findErr) return NextResponse.json({ error: findErr.message }, { status: 500 });
   if (!device) {
     return NextResponse.json(
-      { error: `Unknown device_id "${body.device_id}". Register it first from the RFID Devices page.` },
+      { error: `Unknown device_code "${body.device_code}". Register it first from the RFID Devices page.` },
       { status: 404 }
     );
   }

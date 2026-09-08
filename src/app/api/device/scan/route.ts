@@ -9,12 +9,12 @@ import { verifyDeviceSecret } from "@/lib/device-auth";
  * (public.process_rfid_scan) which decides entry/exit, late/present,
  * and blocks duplicate scans within the configured window.
  *
- * Body: {
- *   device_id: string,        // e.g. "RFID-01"
+ * Body (matches kncc-esp32-rfid-terminal/docs/api-contract.md exactly): {
+ *   device_code: string,       // e.g. "RFID-01"
  *   device_secret: string,
  *   rfid_uid: string,
- *   timestamp: string,        // ISO 8601, from the device's RTC
- *   attendance_type?: "entry" | "exit"  // advisory only; server decides
+ *   scanned_at: string,        // ISO 8601, from the device's RTC (or NTP fallback)
+ *   sync_status?: string       // advisory only; always "synced" for a live submission
  * }
  */
 export async function POST(req: NextRequest) {
@@ -32,16 +32,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "rfid_uid is required." }, { status: 400 });
   }
 
-  const scannedAt = body.timestamp ? new Date(body.timestamp) : new Date();
+  const scannedAt = body.scanned_at ? new Date(body.scanned_at) : new Date();
   if (Number.isNaN(scannedAt.getTime())) {
-    return NextResponse.json({ error: "timestamp is not a valid date." }, { status: 400 });
+    return NextResponse.json({ error: "scanned_at is not a valid date." }, { status: 400 });
   }
 
   const supabase = createServiceClient();
 
   const { data, error } = await supabase.rpc("process_rfid_scan", {
     p_rfid_uid: body.rfid_uid,
-    p_device_code: body.device_id,
+    p_device_code: body.device_code,
     p_scanned_at: scannedAt.toISOString(),
   });
 
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   if (!result || result.result === "device_unknown") {
     return NextResponse.json(
-      { error: `Unknown device_id "${body.device_id}". Register it first.` },
+      { error: `Unknown device_code "${body.device_code}". Register it first.` },
       { status: 404 }
     );
   }

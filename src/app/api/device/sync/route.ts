@@ -12,15 +12,18 @@ import { verifyDeviceSecret } from "@/lib/device-auth";
  * logic and duplicate protection are identical for offline and online
  * scans.
  *
- * Body: {
- *   device_id: string,
+ * Body (matches kncc-esp32-rfid-terminal/docs/api-contract.md exactly): {
+ *   device_code: string,
  *   device_secret: string,
  *   records: Array<{
  *     rfid_uid: string,
  *     scanned_at: string,          // ISO 8601, captured from the RTC while offline
- *     attendance_type?: "entry" | "exit"  // advisory only
+ *     sync_status?: string          // advisory only, always "pending" from the device's perspective
  *   }>
  * }
+ *
+ * `results` in the response is returned in the SAME ORDER as the
+ * submitted `records` array — the firmware matches them positionally.
  */
 export async function POST(req: NextRequest) {
   let body: any;
@@ -45,12 +48,12 @@ export async function POST(req: NextRequest) {
   const { data: device, error: findErr } = await supabase
     .from("attendance_devices")
     .select("id")
-    .eq("device_code", body.device_id)
+    .eq("device_code", body.device_code)
     .maybeSingle();
 
   if (findErr) return NextResponse.json({ error: findErr.message }, { status: 500 });
   if (!device) {
-    return NextResponse.json({ error: `Unknown device_id "${body.device_id}".` }, { status: 404 });
+    return NextResponse.json({ error: `Unknown device_code "${body.device_code}".` }, { status: 404 });
   }
 
   const results: any[] = [];
@@ -85,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const { data: procData, error: procErr } = await supabase.rpc("process_rfid_scan", {
       p_rfid_uid: rec.rfid_uid,
-      p_device_code: body.device_id,
+      p_device_code: body.device_code,
       p_scanned_at: scannedAt.toISOString(),
     });
 

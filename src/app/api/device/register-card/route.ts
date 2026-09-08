@@ -12,7 +12,7 @@ import { verifyDeviceSecret } from "@/lib/device-auth";
  * find it on the RFID Cards page and assign it to a student.
  *
  * Body: {
- *   device_id: string,
+ *   device_code: string,
  *   device_secret: string,
  *   rfid_uid: string
  * }
@@ -37,11 +37,11 @@ export async function POST(req: NextRequest) {
   const { data: device } = await supabase
     .from("attendance_devices")
     .select("id")
-    .eq("device_code", body.device_id)
+    .eq("device_code", body.device_code)
     .maybeSingle();
 
   if (!device) {
-    return NextResponse.json({ error: `Unknown device_id "${body.device_id}".` }, { status: 404 });
+    return NextResponse.json({ error: `Unknown device_code "${body.device_code}".` }, { status: 404 });
   }
 
   const uid = body.rfid_uid.trim().toUpperCase();

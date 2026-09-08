@@ -10,7 +10,7 @@ import { verifyDeviceSecret } from "@/lib/device-auth";
  * timeout to show it offline.
  *
  * Body: {
- *   device_id: string,
+ *   device_code: string,
  *   device_secret: string,
  *   status: "online" | "offline",
  *   firmware_version?: string,
@@ -37,12 +37,12 @@ export async function POST(req: NextRequest) {
   const { data: device, error: findErr } = await supabase
     .from("attendance_devices")
     .select("id")
-    .eq("device_code", body.device_id)
+    .eq("device_code", body.device_code)
     .maybeSingle();
 
   if (findErr) return NextResponse.json({ error: findErr.message }, { status: 500 });
   if (!device) {
-    return NextResponse.json({ error: `Unknown device_id "${body.device_id}".` }, { status: 404 });
+    return NextResponse.json({ error: `Unknown device_code "${body.device_code}".` }, { status: 404 });
   }
 
   const update: Record<string, any> = { status: body.status };
