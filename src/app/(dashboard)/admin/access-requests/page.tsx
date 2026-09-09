@@ -31,7 +31,7 @@ export default function AccessRequestsPage() {
     const [{ data, error }, { count }] = await Promise.all([
       supabase
         .from("access_requests")
-        .select("*, profile:profiles(*)")
+        .select("*, profile:profiles!access_requests_profile_id_fkey(*)")
         .eq("status", "pending")
         .order("created_at", { ascending: true }),
       supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "super_admin").eq("status", "approved"),

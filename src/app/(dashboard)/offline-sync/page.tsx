@@ -21,7 +21,7 @@ export default function OfflineSyncPage() {
     const { data, error } = await supabase
       .from("attendance_sync_queue")
       .select("*, device:attendance_devices(device_name, device_code)")
-      .order("received_at", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(200);
     if (error) toast.error(error.message);
     setQueue(data ?? []);
@@ -40,13 +40,13 @@ export default function OfflineSyncPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pending = queue.filter((q) => q.status === "pending").length;
-  const failed = queue.filter((q) => q.status === "failed").length;
-  const synced = queue.filter((q) => q.status === "synced").length;
+  const pending = queue.filter((q) => q.sync_status === "pending").length;
+  const failed = queue.filter((q) => q.sync_status === "failed").length;
+  const synced = queue.filter((q) => q.sync_status === "synced").length;
 
   async function retry(id: string) {
     setRetrying(id);
-    const { error } = await supabase.from("attendance_sync_queue").update({ status: "pending", error_message: null }).eq("id", id);
+    const { error } = await supabase.from("attendance_sync_queue").update({ sync_status: "pending", error_message: null }).eq("id", id);
     setRetrying(null);
     if (error) {
       toast.error(error.message);
@@ -97,11 +97,11 @@ export default function OfflineSyncPage() {
                   <td className="px-4 py-3 font-mono text-xs">{q.rfid_uid}</td>
                   <td className="px-4 py-3 text-slate-500">{q.device?.device_name ?? q.device?.device_code ?? "—"}</td>
                   <td className="px-4 py-3 text-slate-500">{formatDateTime(q.scanned_at)}</td>
-                  <td className="px-4 py-3"><Badge tone={statusTone(q.status)}>{q.status}</Badge></td>
+                  <td className="px-4 py-3"><Badge tone={statusTone(q.sync_status)}>{q.sync_status}</Badge></td>
                   <td className="px-4 py-3 text-slate-500">{q.attempts}</td>
                   <td className="px-4 py-3 max-w-xs truncate text-xs text-red-500">{q.error_message ?? "—"}</td>
                   <td className="px-4 py-3 text-right">
-                    {q.status === "failed" && (
+                    {q.sync_status === "failed" && (
                       <button onClick={() => retry(q.id)} disabled={retrying === q.id} className="rounded p-1.5 text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950">
                         {retrying === q.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
                       </button>

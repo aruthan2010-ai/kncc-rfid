@@ -75,8 +75,7 @@ export async function POST(req: NextRequest) {
         device_id: device.id,
         rfid_uid: rec.rfid_uid,
         scanned_at: scannedAt.toISOString(),
-        attendance_type: rec.attendance_type ?? null,
-        status: "pending",
+        sync_status: "pending",
       })
       .select()
       .single();
@@ -97,7 +96,7 @@ export async function POST(req: NextRequest) {
     if (procErr || !result || result.result === "device_unknown") {
       await supabase
         .from("attendance_sync_queue")
-        .update({ status: "failed", error_message: procErr?.message ?? "processing failed", attempts: 1 })
+        .update({ sync_status: "failed", error_message: procErr?.message ?? "processing failed", attempts: 1 })
         .eq("id", queueRow.id);
       results.push({ rfid_uid: rec.rfid_uid, status: "failed", error: procErr?.message ?? "processing failed" });
       continue;
@@ -106,7 +105,7 @@ export async function POST(req: NextRequest) {
     if (result.result === "card_invalid") {
       await supabase
         .from("attendance_sync_queue")
-        .update({ status: "failed", error_message: "card invalid/unregistered", attempts: 1 })
+        .update({ sync_status: "failed", error_message: "card invalid/unregistered", attempts: 1 })
         .eq("id", queueRow.id);
       results.push({ rfid_uid: rec.rfid_uid, status: "rejected", reason: "card_invalid" });
       continue;
@@ -117,8 +116,8 @@ export async function POST(req: NextRequest) {
     await supabase
       .from("attendance_sync_queue")
       .update({
-        status: "synced",
-        processed_record_id: result.attendance_id ?? null,
+        sync_status: "synced",
+        processed_attendance_id: result.attendance_id ?? null,
         processed_at: new Date().toISOString(),
       })
       .eq("id", queueRow.id);

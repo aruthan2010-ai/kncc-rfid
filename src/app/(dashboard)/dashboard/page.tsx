@@ -36,7 +36,7 @@ export default async function DashboardPage() {
     supabase.from("attendance_records").select("status, attendance_type, student_id").eq("attendance_date", today),
     supabase.from("attendance_devices").select("*", { count: "exact", head: true }),
     supabase.from("attendance_devices").select("*"),
-    supabase.from("attendance_sync_queue").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("attendance_sync_queue").select("*", { count: "exact", head: true }).eq("sync_status", "pending"),
     supabase
       .from("attendance_records")
       .select("*, student:students(full_name, index_number), device:attendance_devices(device_name)")
