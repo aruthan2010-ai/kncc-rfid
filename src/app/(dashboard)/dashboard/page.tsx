@@ -4,7 +4,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge, statusTone } from "@/components/ui/badge";
-import { formatTime, timeAgo } from "@/lib/utils";
+import { formatTime, timeAgo, computeEffectiveDeviceStatus } from "@/lib/utils";
 import {
   Users,
   UserCheck,
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
   const absent = Math.max((totalStudents ?? 0) - presentStudentIds.size, 0);
   const attendancePct = totalStudents ? Math.round((presentStudentIds.size / totalStudents) * 100) : 0;
 
-  const onlineDevices = devices?.filter((d) => d.status === "online").length ?? 0;
+  const onlineDevices = devices?.filter((d) => computeEffectiveDeviceStatus(d.status, d.last_heartbeat_at) === "online").length ?? 0;
   const offlineDevices = (deviceCount ?? 0) - onlineDevices;
 
   const hasAnyData = (totalStudents ?? 0) > 0;

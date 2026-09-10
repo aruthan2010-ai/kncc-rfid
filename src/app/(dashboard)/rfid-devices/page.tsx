@@ -10,13 +10,18 @@ import { Badge, statusTone } from "@/components/ui/badge";
 import { Cpu, Plus, Loader2, Trash2, Radio, Wifi, WifiOff } from "lucide-react";
 import toast from "react-hot-toast";
 import type { AttendanceDevice } from "@/types";
-import { formatDateTime, timeAgo } from "@/lib/utils";
+import { formatDateTime, timeAgo, computeEffectiveDeviceStatus } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 export default function RfidDevicesPage() {
   const supabase = createClient();
   const [devices, setDevices] = useState<AttendanceDevice[]>([]);
   const [loading, setLoading] = useState(true);
+  // Ticks every 5s purely to force a re-render, so a device that's gone
+  // silent (power cut, no graceful "offline" message possible) flips to
+  // "Offline" on screen the moment its heartbeat ages past the
+  // threshold — without needing any new data from the server.
+  const [, setClockTick] = useState(0);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -38,8 +43,10 @@ export default function RfidDevicesPage() {
       .channel("devices-status")
       .on("postgres_changes", { event: "*", schema: "public", table: "attendance_devices" }, () => load())
       .subscribe();
+    const tickInterval = setInterval(() => setClockTick((t) => t + 1), 5000);
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(tickInterval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -106,7 +113,9 @@ export default function RfidDevicesPage() {
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {devices.map((d) => (
+          {devices.map((d) => {
+            const effectiveStatus = computeEffectiveDeviceStatus(d.status, d.last_heartbeat_at);
+            return (
             <div key={d.id} className="card p-4">
               <div className="flex items-start justify-between">
                 <div>
@@ -114,9 +123,9 @@ export default function RfidDevicesPage() {
                   <p className="font-semibold text-slate-900 dark:text-slate-100">{d.device_name}</p>
                   {d.location && <p className="text-xs text-slate-500 dark:text-slate-400">{d.location}</p>}
                 </div>
-                <Badge tone={statusTone(d.status)}>
-                  {d.status === "online" ? <Wifi className="h-3 w-3" /> : d.status === "offline" ? <WifiOff className="h-3 w-3" /> : <Radio className="h-3 w-3" />}
-                  {d.status}
+                <Badge tone={statusTone(effectiveStatus)}>
+                  {effectiveStatus === "online" ? <Wifi className="h-3 w-3" /> : effectiveStatus === "offline" ? <WifiOff className="h-3 w-3" /> : <Radio className="h-3 w-3" />}
+                  {effectiveStatus}
                 </Badge>
               </div>
               <div className="mt-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
@@ -131,7 +140,8 @@ export default function RfidDevicesPage() {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

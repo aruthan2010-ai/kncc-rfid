@@ -52,3 +52,38 @@ export function initials(name: string) {
     .map((p) => p[0]?.toUpperCase())
     .join("");
 }
+
+// A device sends a heartbeat every 30s (HEARTBEAT_INTERVAL_MS in its
+// firmware config.h). If power is cut, it can never send a final
+// "offline" message — so we can't wait for the device to tell us it's
+// gone. Instead we treat "no heartbeat for 3 missed cycles" as offline,
+// computed live on the client from last_heartbeat_at, rather than
+// trusting the stored `status` column alone (which only ever gets set
+// to "online" by a heartbeat, or "offline" by a *graceful* shutdown —
+// neither of which happens on a sudden power loss).
+export const DEVICE_OFFLINE_THRESHOLD_MS = 90_000; // 3x the 30s heartbeat interval
+
+export type EffectiveDeviceStatus = "online" | "offline" | "unknown";
+
+export function computeEffectiveDeviceStatus(
+  storedStatus: string | null | undefined,
+  lastHeartbeatAt: string | Date | null | undefined
+): EffectiveDeviceStatus {
+  // Never connected at all — nothing to time out.
+  if (!lastHeartbeatAt) {
+    return storedStatus === "offline" ? "offline" : "unknown";
+  }
+
+  const last = typeof lastHeartbeatAt === "string" ? new Date(lastHeartbeatAt) : lastHeartbeatAt;
+  if (Number.isNaN(last.getTime())) return "unknown";
+
+  const elapsedMs = Date.now() - last.getTime();
+  if (elapsedMs > DEVICE_OFFLINE_THRESHOLD_MS) {
+    return "offline";
+  }
+
+  // Heartbeat is recent enough to trust — but still honor an explicit
+  // graceful "offline" the device reported itself (e.g. a controlled
+  // reboot), since that's more precise than waiting out the timeout.
+  return storedStatus === "offline" ? "offline" : "online";
+}
