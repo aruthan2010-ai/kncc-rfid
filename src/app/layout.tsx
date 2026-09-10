@@ -8,6 +8,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "KNCC RFID Attendance System",
   description: "RFID-based student attendance management for KN/Kilinochchi Central College",
+  icons: {
+    icon: "/school-logo.png",
+    apple: "/school-logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

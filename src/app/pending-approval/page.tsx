@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Clock3, LogOut, RefreshCw, School } from "lucide-react";
+import { Clock3, LogOut, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function PendingApprovalPage() {
   const router = useRouter();
@@ -23,14 +24,14 @@ export default function PendingApprovalPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-brand-950 via-brand-900 to-slate-950 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-navy-950 via-navy-900 to-slate-950 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-lg">
-            <School className="h-7 w-7 text-brand-600" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg ring-2 ring-gold-400">
+            <Image src="/school-logo.png" alt="KN/Kilinochchi Central College crest" width={56} height={56} className="h-full w-full object-contain" priority />
           </div>
           <h1 className="text-lg font-semibold text-white">KNCC RFID Attendance System</h1>
-          <p className="mt-1 text-sm text-brand-200">KN/Kilinochchi Central College</p>
+          <p className="mt-1 text-sm text-gold-300">KN/Kilinochchi Central College</p>
         </div>
 
         <div className="card p-8 text-center">

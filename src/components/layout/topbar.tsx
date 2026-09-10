@@ -21,7 +21,7 @@ export function Topbar({ profile, onMenuClick }: { profile: Profile; onMenuClick
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-b-slate-200 border-t-2 border-t-navy-700 bg-white/80 px-4 backdrop-blur dark:border-b-slate-800 dark:bg-slate-900/80 sm:px-6">
       <button onClick={onMenuClick} className="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800" aria-label="Open menu">
         <Menu className="h-5 w-5" />
       </button>

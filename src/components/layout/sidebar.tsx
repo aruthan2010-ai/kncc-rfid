@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -20,7 +21,6 @@ import {
   History,
   Settings,
   UserPlus,
-  School,
   X,
 } from "lucide-react";
 import type { UserRole } from "@/types";
@@ -100,17 +100,17 @@ export function Sidebar({
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-navy-950 px-5 py-4 dark:border-slate-800">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <School className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1 ring-2 ring-brand-400">
+              <Image src="/school-logo.png" alt="KN/Kilinochchi Central College crest" width={32} height={32} className="h-full w-full object-contain" priority />
             </div>
             <div className="leading-tight">
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">KNCC RFID</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">Kilinochchi Central College</p>
+              <p className="text-sm font-semibold text-white">KNCC RFID</p>
+              <p className="text-[11px] text-brand-300">Kilinochchi Central College</p>
             </div>
           </Link>
-          <button onClick={onClose} className="rounded-md p-1 text-slate-400 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800" aria-label="Close menu">
+          <button onClick={onClose} className="rounded-md p-1 text-navy-300 hover:bg-navy-900 lg:hidden" aria-label="Close menu">
             <X className="h-5 w-5" />
           </button>
         </div>
